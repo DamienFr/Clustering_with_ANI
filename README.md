@@ -11,3 +11,5 @@ How to use the programm ?
 1. Open	Launch_ANI.sh and modify the parameters as you wish
 2. Give execution permission to the script by typing in a terminal "chmod +x	Launch_ANI.sh" or right-clicking on it.
 3. Double-click the program and it executes, producing two output files.
+
+The folder "scripts" contain 4 scripts that represent the backbone of the pipeline. Any script can be run alone without any arguments to get to its help instructions. 
