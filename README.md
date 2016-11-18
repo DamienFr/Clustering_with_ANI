@@ -12,7 +12,7 @@ How to use the programm ?
 
 Usage: /home/path_to_the_script/Launch_ANI.sh -f fasta_file [-i 90] [-l 90] [-s 1020] [-k] [-h]
 
-[] means argument is optional
+[ ] means argument is optional
 
 available arguments:
 
