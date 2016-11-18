@@ -58,18 +58,18 @@ GetOptions(
 die `pod2text $0` unless $qr && $sb && $od && $fd && $bl && $id_cut && $cvg_cut ;
 die `pod2text $0` if $hl;
 
-if($chop_len < 20 ){print "\n\nYou shouldn't use a segment length inferior to 20bp, it's already very small, knowing defaut blast word size is 11 ... I'll die now ... relaunch me ;) \n\n"; die}
+if($chop_len < 20 ){print "\nYou shouldn't use a segment length inferior to 20bp, it's already very small, knowing defaut blast word size is 11 ... I'll die now ... relaunch me ;) \n"; die}
 
-print "\n#####################\n03.ANI.pl running ...\n#####################\n";
 
 $qr=abs_path($qr);
 $sb=abs_path($sb);
-unless(-d $od){`mkdir $od`;}
+my $tmp = "./temporary_ANI_folder";
+unless(-d $tmp){`mkdir $tmp`;}
 
-#Split query genome and write segments in $od/Query.split
+#Split query genome and write segments in $tmp/Query.split
 $/ = "\n>"; #this is a nice way to read in fasta files that can be multiline fasta
 open (my $fasta_file,"<", $qr ) or die "Can't open $qr $!\n";
-open (my $fasta_splitted ,">", "$od/Query.split") or die "Can't open $od/Query.split $!\n";
+open (my $fasta_splitted ,">", "$tmp/Query.split") or die "Can't open $tmp/Query.split $!\n";
 my $number_parts = 0;
 while(<$fasta_file>){
 	chomp;
@@ -79,7 +79,7 @@ while(<$fasta_file>){
 	$seq =~ s/\s+//g;
 	my @cut = ($seq =~ /(.{1,$chop_len})/g);
 	$number_parts = $#cut + 1;
-		if($number_parts < 10){print "\nWarning: Your sequence $qr is only cut into $number_parts segments, which will make the analysis not very sensitive. Think about DECREASING size of \"seg_length\" variable\n\n"}
+		if($number_parts < 10){ my $seq_name = (split /\//, $qr)[-1] ; print "\nWarning: Sequence $seq_name only cut into $number_parts segments, which will make the analysis not very sensitive. You should decrease segment length\n"}
 	for my $cut_num (0..$#cut){
 		#next if length($cut[$cut_num]) < 100;
 		next if length($cut[$cut_num]) < (0.1*$chop_len); #i prefer to ignore a segment if its size is inferior to 10% of the selected fragment length than to specify a fixed value, it's smarter.
@@ -90,14 +90,18 @@ while(<$fasta_file>){
 
 $/ = "\n";
 
-#BLAST alingment
-`ln -sf $sb $od/Subject.fa`;
-`$fd -i $od/Subject.fa -p F`;
-`$bl -query $od/Query.split -task blastn -db $od/Subject.fa -out $od/raw.blast -penalty -2 -reward 1 -gapopen 2 -gapextend 2 -outfmt '10 std qlen gaps qseq sseq'`;
+## BLAST alingment
+
+#print "Creating symlink for subject fasta...\n";
+`ln -sf "${sb}" $tmp/Subject.fa`;
+#print "Formating Database of the query ...\n";
+`$fd -i $tmp/Subject.fa -p F`;
+#print "Blasting subject against query Database...\n";
+`$bl -query $tmp/Query.split -task blastn -db $tmp/Subject.fa -out $tmp/raw.blast -penalty -2 -reward 1 -gapopen 2 -gapextend 2 -outfmt '10 std qlen gaps qseq sseq'`;
 
 my ($ANI,%qr_best); my $count = my $sumID = 0;
 
-open (my $blast_result, "<", "$od/raw.blast") or die "Can't open in read mode raw.blast $!\n";
+open (my $blast_result, "<", "$tmp/raw.blast") or die "Can't open in read mode raw.blast $!\n";
 while(<$blast_result>){
 	chomp;
 	my @t = split /,/;
@@ -116,10 +120,9 @@ if ($qr =~ /\//){$qr2 = (split /\//, $qr)[-1]}else{$qr2 = $qr}
 if ($sb =~ /\//){$sb2 = (split /\//, $sb)[-1]}else{$sb2 = $sb}
 
 
-open (my $out, ">>", "result_ANI" . ".$id_cut" . ".$cvg_cut" ) or die "can't open $!";
+open (my $out, ">>", $od . "result_ANI" . ".$id_cut" . ".$cvg_cut" ) or die "can't open $!";
 if($ANI != 0){
 	print $out "$qr2\t$sb2\tANI:\t$ANI\tseq_cut_into:\t$number_parts\tmatching_parts:\t$count\n";
 }
 
-print "End of script ... if i'm part of a pipeline, i'll run square times the nb of sequences\n";
-
+#print "End of script ... if i'm part of a pipeline, i'll run square times the nb of sequences\n";
