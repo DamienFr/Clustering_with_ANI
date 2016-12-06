@@ -64,12 +64,14 @@ rm -f formatdb.log
 # je récupère la taille de toutes les séquences
 perl -ne 'if (/^>/){print}else{print length() . "\n"}' 01.fasta_to_analyse_${DATE}/*splitted* >> ./results_ANI_${DATE}/size_of_all_fiches_${DATE}
 
-
-
 #04.prepare_ani_result.pl extracts the best results from the ANI result file, using size of all sequences 
 perl ${SCRIPTPATH}/scripts/04.prepare_ani_result.pl  ./results_ANI_${DATE}/size_of_all_fiches_${DATE} ./results_ANI_${DATE}/result_ANI.${identity_p_cent}.${length_p_cent} #directly outputs "bestresult_ANI.${stringence}.${stringence}"
 #From the intput multi-fasta (first argument) and the ANI result file (second argument), this script outputs the corresponding clusters\nThe hard part is to create the clusters from the ANi result file that contains pair by pair comparisons of the sequences
-perl ${SCRIPTPATH}/scripts/05.produce_clusered_seqs.pl ${fasta_file} ./results_ANI_${DATE}/bestresult_ANI.${identity_p_cent}.${length_p_cent} #outputs bestresult_ANI.95.95.out2 and bestresult_ANI.95.95.out and bestresult_ANI.95.95.log if third argument provided
+# script 05 only treats one line fasta, i'll therefore create it as temporary file and delete it later # 06/12/2016
+perl -ne 'if(/>/){if(!$a){print}else{print "\n$_"}}else{s/\r?\n//g; print}; $a++' ${fasta_file} > ${fasta_file}.tmp
+perl ${SCRIPTPATH}/scripts/05.produce_clusered_seqs.pl ${fasta_file}.tmp ./results_ANI_${DATE}/bestresult_ANI.${identity_p_cent}.${length_p_cent} #outputs bestresult_ANI.95.95.out2 and bestresult_ANI.95.95.out and bestresult_ANI.95.95.log if third argument provided
+
+rm -rf ${fasta_file}.tmp
 
 
 if ! $log_mode  ; then 
