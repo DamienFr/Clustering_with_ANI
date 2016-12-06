@@ -45,7 +45,7 @@ if($#ARGV == 2){ $log_mode = 1}
 
 
 my (%key_ch_of_val, %key_prt_of_arr_val, $fasta_out);
-if ($fasta =~ /\//){$fasta_out = (split /\//, $fasta)[-1]}else{$fasta_out = $fasta}
+# if ($fasta =~ /\//){$fasta_out = (split /\//, $fasta)[-1]}else{$fasta_out = $fasta}
 
 open (my $input_ani, "<", $ani) or die "can't open $!";
 while (my $li = <$input_ani>){
@@ -140,8 +140,10 @@ while (my $li = <$input_ani>){
 #je vais ouvrir le fichier fasta pour regarder sur toutes les lignes si la séquence est à garder ou non
 
 open (FAS, "<", $fasta ) or die "can't open $!";
-open (OUT, ">", $fasta . "_clust_and_seqs.fasta") or die "can't open $!";
-open (OUT2, ">", $fasta . "_clust_names_alone.txt") or die "can't open $!";
+$fasta_out = $fasta;
+$fasta_out =~ s/\.tmp$//;
+open (OUT, ">", $fasta_out . "_clust_and_seqs.fasta") or die "can't open $!";
+open (OUT2, ">", $fasta_out . "_clust_names_alone.txt") or die "can't open $!";
 
 
 my $k = 0;
@@ -151,6 +153,7 @@ while (my $fli = <FAS>){
 
 	if($fli =~ /^>/)
 	{
+	$fli =~ s/\|/./; # In script 02.split_fasta, i replace all the pipes in the fasta headers by a ., i need to do the same here to have the correspondance because if not the script will not find back the cotrresponding sequences
 		$fli =~ s/>//;
 		$fli = $fli . "_nucl_splitted";
 		#print $fli . "\n";
@@ -205,4 +208,3 @@ close LOG;
 
 
 print "\n#####################\nEnd of 05.produce_clusered_seqs.pl\n#####################\n";
-
