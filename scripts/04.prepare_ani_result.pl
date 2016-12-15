@@ -12,14 +12,14 @@ my $ani = $ARGV[1];
 chomp $ani;
 
 #size_of_all_fiches
-open (my $size_file, "<", $sizefile) or die "can't open $!";
+open (my $size_file, "<", $sizefile) or die "erreur 1 can't open $!";
 my (%h_size, $tmp);
 while (my $li2 = <$size_file>){
 	$li2 =~ s/\r?\n//g;
 	if($li2 =~ /^>/) {$li2 =~ s/>//;$tmp = $li2} else {$h_size{$tmp} = $li2; $tmp=""} # %h_size contains all the sizes of the sequences
 }
 
-open (my $ani_file, "<", $ani) or die "can't open $!";
+open (my $ani_file, "<", $ani) or die "erreur 2 can't open $!";
 my %h;
 while (my $li = <$ani_file>)
 {
@@ -47,10 +47,15 @@ foreach my $kei (sort { $h{$b} <=> $h{$a} } keys %h) #inside this hash we are wo
 	}
 }
 
+$ani =~ s/([^\.]*)\.\/(.*)/$1$2/;
+my $folderr = $ani; $folderr =~ s/([^\/]*)\/(.*)/$1/;
+$ani =~ s/([^\/]*)\/(.*)/$2/;
+my $output_best_ani = $folderr . "/best" . $ani ;
+#print "\n\n\nvoici le chemin non créé\n$output_best_ani\n\n\n";
+# best./results_ANI_2016-12-15:19:33:54/result_ANI.90.90
 
-my $output_best_ani = "best" . $ani ;
 if (-e $output_best_ani){unlink $output_best_ani; print "Previous output $output_best_ani removed\n"}
-open (my $out, ">", $output_best_ani) or die "can't open $!";
+open (my $out, ">", $output_best_ani) or die "erreur 3 can't open $!";
 
 # %h3 contains only ther best results
 foreach my $key3 (keys %h3){  #we print the best results in the output file
@@ -58,7 +63,6 @@ foreach my $key3 (keys %h3){  #we print the best results in the output file
 }
 
 print "\nEnd of 04.prepare_ani_result.pl\n";
-
 
 
 
