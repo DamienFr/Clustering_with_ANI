@@ -24,6 +24,13 @@ if($#ARGV == 2){ $log_mode = 1}
 
 
 
+	
+	my $RED="\e[31m";
+	my $GREEN="\033[0m";
+	my $ORANGE="\e[33m";
+	
+
+
 ##################################################################################################################################################################################
 #########  In this script, variable names are COMPLICATED, therefore i'll explain it here. #######################################################################################
 ##################################################################################################################################################################################
@@ -47,7 +54,7 @@ if($#ARGV == 2){ $log_mode = 1}
 my (%key_ch_of_val, %key_prt_of_arr_val, $fasta_out);
 # if ($fasta =~ /\//){$fasta_out = (split /\//, $fasta)[-1]}else{$fasta_out = $fasta}
 
-open (my $input_ani, "<", $ani) or die "can't open $!";
+open (my $input_ani, "<", $ani ) or die "${RED}$ani can't be opened :\n $! ${GREEN}";
 while (my $li = <$input_ani>){
 	$li =~ s/\r?\n//g;
 	my @field = split /\t/, $li;
@@ -139,11 +146,11 @@ while (my $li = <$input_ani>){
 
 #je vais ouvrir le fichier fasta pour regarder sur toutes les lignes si la séquence est à garder ou non
 
-open (FAS, "<", $fasta ) or die "can't open $!";
+open (FAS, "<", $fasta ) or die "${RED}$fasta can't be opened :\n $! ${GREEN}";
 $fasta_out = $fasta;
 $fasta_out =~ s/\.tmp$//;
-open (OUT, ">", $fasta_out . "_clust_and_seqs.fasta") or die "can't open $!";
-open (OUT2, ">", $fasta_out . "_clust_names_alone.txt") or die "can't open $!";
+open (OUT, ">", $fasta_out . "_clust_and_seqs.fasta") or die "${RED}${fasta_out}_clust_and_seqs.fasta can't be opened :\n $! ${GREEN}";
+open (OUT2, ">", $fasta_out . "_clust_names_alone.txt") or die "${RED}${fasta_out}_clust_names_alone.txt can't be opened :\n $! ${GREEN}";
 
 
 my $k = 0;
@@ -153,14 +160,24 @@ while (my $fli = <FAS>){
 
 	if($fli =~ /^>/)
 	{
-	$fli =~ s/\|/./; # In script 02.split_fasta, i replace all the pipes in the fasta headers by a ., i need to do the same here to have the correspondance because if not the script will not find back the cotrresponding sequences
-		$fli =~ s/>//;
+	
+
+	$fli =~ s/^>//;
+	if ($fli =~ /[^0-9a-zA-Z]/) {  print "\n${ORANGE}02.script_split_fasta.pl: fasta name containing one or more special characters, replacing it by '.' in $fli\n${GREEN}"  }
+	$fli =~ s/[^0-9a-zA-Z]/./g;
+	
+
+
+	#$fli =~ s/\|/./; # In script 02.split_fasta, i replace all the pipes in the fasta headers by a ., i need to do the same here to have the correspondance because if not the script will not find back the cotrresponding sequences
+	
+#		$fli =~ s/>//;
 		$fli = $fli . "_nucl_splitted";
 		#print $fli . "\n";
 		if( exists $key_prt_of_arr_val{$fli})
 			{
 			#if we are in here it means the studied seq is the parent of someone
-			my $to_print = ">" . $fli . join("_",@{$key_prt_of_arr_val{$fli}}) . "\n";
+			 my $to_print = ">" . $fli . join("_",@{$key_prt_of_arr_val{$fli}}) . "\n"; # old output version
+			#my $to_print = ">" . $fli . "\n"; # new output version (16.12.2016)
 			$to_print =~ s/_nucl_splitted/_/g;
 			$to_print =~ s/__/_/g;
 			print OUT $to_print;
@@ -195,7 +212,7 @@ close OUT2;
 
 if($log_mode)
 {
-open (LOG, ">", $ani . "log") or die "can't open $!";
+open (LOG, ">", $ani . "log") or die "${RED}${ani}.log can't be opened :\n $! ${GREEN}";
 foreach my $key (keys %key_prt_of_arr_val){
 	print LOG $key . "\t";
 	foreach my $j (0 .. $#{$key_prt_of_arr_val{$key}})
