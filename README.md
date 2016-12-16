@@ -9,6 +9,7 @@ Usage: Launch_ANI.sh -f fasta_file [-i 90] [-l 90] [-s 1020] [-k] [-h]
 
 with available arguments:
 
+
   -f  input file, fasta format
   -i  percentage identity cutoff for two DNA fragments to be considered from the same cluster (default 90)
   -l  minimum match length match between two fragment to be consider for clustering. percentage length of the longuest sequence (default 90)
