@@ -167,32 +167,31 @@ while (my $fli = <FAS>){
 	$fli =~ s/[^0-9a-zA-Z]/./g;
 	
 
+		my $fli_splitted = $fli . "_nucl_splitted";
 
-	#$fli =~ s/\|/./; # In script 02.split_fasta, i replace all the pipes in the fasta headers by a ., i need to do the same here to have the correspondance because if not the script will not find back the cotrresponding sequences
-	
-#		$fli =~ s/>//;
-		$fli = $fli . "_nucl_splitted";
-		#print $fli . "\n";
-		if( exists $key_prt_of_arr_val{$fli})
+		if( exists $key_prt_of_arr_val{$fli_splitted})
 			{
 			#if we are in here it means the studied seq is the parent of someone
-			 my $to_print = ">" . $fli . join("_",@{$key_prt_of_arr_val{$fli}}) . "\n"; # old output version
-			#my $to_print = ">" . $fli . "\n"; # new output version (16.12.2016)
-			$to_print =~ s/_nucl_splitted/_/g;
-			$to_print =~ s/__/_/g;
+			# my $to_print = ">" . $fli . join("_",@{$key_prt_of_arr_val{$fli}}) . "\n"; # old output version
+			foreach my $item (@{$key_prt_of_arr_val{$fli_splitted}}) { $item =~ s/_nucl_splitted//; print OUT2 "$fli\t$item\n"}
+			my $to_print = ">$fli\n"; # new output version that outputs only the parent cluster (16.12.2016)
 			print OUT $to_print;
-			print OUT2 $to_print;
 			$k = 1;}
 		else
 		{ #if we are in here it means the studied seq is NOT PARENT
-			if(!exists $key_ch_of_val{$fli})
+			if(!exists $key_ch_of_val{$fli_splitted})
 				{
 				#studied seq is not child of anybody, therefore we need to print it's sequence (it's the only seq in this cluster)
-				my $toprint2 = ">" . $fli . "\n";
-				$toprint2 =~ s/_nucl_splitted/_/g;
-				$toprint2 =~ s/__/_/g;
-				print OUT $toprint2 ;
-				print OUT2 $toprint2 ;
+				my $toprint2 = ">" . $fli;
+				print OUT $toprint2 . "\n";
+				print OUT2 "$fli\t$fli\n";
+				
+				
+
+				
+				
+				
+				
 				$k = 1;}
 			else
 				{print "."} #studied seq IS CHILD OF SOMEONE, therefore its seq has been printed in the cluster seq it belongs to 
