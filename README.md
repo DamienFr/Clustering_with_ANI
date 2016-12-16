@@ -7,15 +7,16 @@ Usage: Launch_ANI.sh -f fasta_file [-i 90] [-l 90] [-s 1020] [-k] [-h]
 
 [ ] means argument is optional
 
-with available arguments:
 
+available arguments:
 
-  -f  input file, fasta format
-  -i  percentage identity cutoff for two DNA fragments to be considered from the same cluster (default 90)
-  -l  minimum match length match between two fragment to be consider for clustering. percentage length of the longuest sequence (default 90)
-  -s  segment length analysis window. This length must be shorter than the shorter studied sequence. Should be < 10% of the shorter sequence's length for best accuracy, but shouldn't be < 200
-  -k  activate log mode. Keep the two temporary subfolders created for the analysis
-  -h  display this help
+	-f	input file, fasta format
+	-i	percentage of identical bases between two DNA fragments to consider them identical. Default 90%
+	-l	identity of two DNA fragments must cover at least this percentage of the longest fragment to consider them identical. Default 90%
+	-s	segment length. Must be shorter than the shorter studied sequence. Should be < 10% of the shorter sequence's length for best accuracy, but shouldn't be < 200
+	-k	activate log mode. Keep the two subfolders created for the analysis instead of removing them 
+	-h	display this help
+
 
 The folder "scripts" contain 4 scripts that represent the backbone of the pipeline. Any script can be run alone without any arguments to get to its help instructions.
 
