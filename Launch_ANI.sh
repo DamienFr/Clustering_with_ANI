@@ -30,6 +30,13 @@ done
 [ -z "$seg_length_ANI" ]  && seg_length_ANI=1020 && echo "-s (fragment length) not specified, using default value 1020. Seqs should not be < 10 000 nucleotides"
 
 
+RED='\E[31;40m'
+GREEN='\E[32;40m'
+
+command -v makeblastdb >/dev/null 2>&1 || { printf "${RED}I require makeblastdb but it's not installed.\n to install it type into the terminal\n \"sudo apt-get install makeblastdb\" \n ${GREEN}" >&2; exit 1; }
+command -v blastn >/dev/null 2>&1 || { printf "${RED}I require blastn but it's not installed.\n to install it type into the terminal\n \"sudo apt-get install blastn\" \n ${GREEN}" >&2; exit 1; }
+
+
 
 fasta_file=$(basename $input) # Indicate the path leading to your multi-fasta file,  example: fasta_file=/home/user/filtration/sequence.fasta
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -52,7 +59,7 @@ do
 	for ffiles in 01.fasta_to_analyse_${DATE}/*splitted*
 	do 
 		if [ $files != $ffiles ] ; then
-		perl ${SCRIPTPATH}/scripts/03.ANI.pl --fd formatdb --bl blastn --qr $files --sb $ffiles --od ./results_ANI_${DATE}/ --id ${identity_p_cent} --length ${length_p_cent} --seg_length ${seg_length_ANI}
+		perl ${SCRIPTPATH}/scripts/03.ANI.pl --fd makeblastdb --bl blastn --qr $files --sb $ffiles --od ./results_ANI_${DATE}/ --id ${identity_p_cent} --length ${length_p_cent} --seg_length ${seg_length_ANI}
 		fi
 	done
 done
@@ -80,4 +87,3 @@ rm -rf results_ANI_${DATE}
 fi
 
 printf "\n#####################\nEnd of the pipeline\n#####################\n\nYour output files are:\n\n-${FASTAPATH}/${fasta_file}_clust_and_seqs.fasta\n-${FASTAPATH}/${fasta_file}_clust_names_alone.txt\n\n"
-
