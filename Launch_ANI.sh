@@ -83,7 +83,6 @@ rm -rf ${fasta_file}.tmp
 
 if ! $log_mode  ; then 
 rm -rf 01.fasta_to_analyse_${DATE}
-rm -rf results_ANI_${DATE}
 fi
 
 printf "\n#####################\nEnd of the pipeline\n#####################\n\nYour output files are:\n\n-${FASTAPATH}/${fasta_file}_clust_and_seqs.fasta\n-${FASTAPATH}/${fasta_file}_clust_names_alone.txt\n\n"
